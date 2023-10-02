@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const productRoute = require('./routes/products');
 const authRoute = require('./routes/auth');
+const userRoute = require('./routes/user');
 
 dotenv.config();
 mongoose.connect(process.env.MONGO_URL)
@@ -19,6 +20,8 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/products', productRoute);
 // Auth route
 app.use('/api/', authRoute);
+// User route
+app.use('/api/users', userRoute);
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}!`);
