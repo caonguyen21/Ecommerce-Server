@@ -1,23 +1,23 @@
 const req = require('express/lib/request');
 const Product = require('../models/Product'); // Assuming your schema is in the 'models' folder
 
-const productsControllers = {
+module.exports = {
     createProduct: async (req, res) => {
         try {
             const newProduct = req.body; // Assuming the request body contains the product data
             const product = await Product.create(newProduct);
-            res.status(201).json({ success: true, product });
+            res.status(201).json(product);
         } catch (error) {
-            res.status(500).json({ success: false, error: error.message });
+            res.status(500).json("Failed to create products");
         }
     },
 
     getAllProducts: async (req, res) => {
         try {
-            const products = await Product.find();
-            res.status(200).json({ success: true, products });
+            const products = await Product.find().sort({createdAt: -1})
+            res.status(200).json(products);
         } catch (error) {
-            res.status(500).json({ success: false, error: error.message });
+            res.status(500).json("Failed to get products");
         }
     },
 
@@ -25,9 +25,9 @@ const productsControllers = {
         const { id } = req.params;
         try {
             const product = await Product.findById(id);
-            res.status(200).json({ success: true, product });
+            res.status(200).json(product);
         } catch (error) {
-            res.status(404).json({ success: false, error: 'Product not found' });
+            res.status(404).json('Product not found');
         }
     },
 
@@ -74,5 +74,3 @@ const productsControllers = {
         }
     }
 }
-
-module.exports = productsControllers;
