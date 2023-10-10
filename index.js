@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const productRoute = require('./routes/products');
 const authRoute = require('./routes/auth');
 const userRoute = require('./routes/user');
+const ordersRoute = require('./routes/orders');
+const cartRoute = require('./routes/cart');
 
 dotenv.config();
 mongoose.connect(process.env.MONGO_URL)
@@ -22,6 +24,10 @@ app.use('/api/products', productRoute);
 app.use('/api/', authRoute);
 // User route
 app.use('/api/users', userRoute);
+// Orders route
+app.use('/api/orders', ordersRoute);
+// Cart route
+app.use('/api/cart', cartRoute);
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}!`);
