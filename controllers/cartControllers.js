@@ -4,39 +4,37 @@ const Cart = require("../models/Cart");
 module.exports = {
     addCart: async (req, res) => {
         const userId = req.user.id;
-        const { cartItem, quantity } = req.body;
+        const { cartItem, quantity, action } = req.body;
 
         try {
-            const cart = await Cart.findOne({ userId })
-            if (cart) {
-                const existingProduct = cart.products.find(
-                    (product) => product.cartItem.toString() === cartItem
-                );
+            let cart = await Cart.findOne({ userId });
 
-                if (existingProduct) {
-                    existingProduct.quantity += 1
-                } else {
-                    cart.products.push({ cartItem, quantity: 1 })
-                }
-
-                await cart.save();
-                res.status(200).json("Product added to cart");
-            } else {
-                const newCart = new Cart({
-                    userId, products: [{ cartItem, quantity: 1 }]
+            if (!cart) {
+                cart = new Cart({
+                    userId,
+                    products: [],
                 });
-                await newCart.save();
-                res.status(200).json("Product added to cart");
             }
+
+            if (action === 'increment') {
+                incrementQuantity(cart, cartItem);
+            } else if (action === 'decrement') {
+                decrementQuantity(cart, cartItem);
+            }
+
+            await cart.save();
+            res.status(200).json({ message: "Quantity updated", cart });
         } catch (error) {
-            res.status(500).json(error);
+            console.error("Error updating quantity:", error);
+            res.status(500).json({ error: "Internal server error" });
         }
     },
 
     getCart: async (req, res) => {
         const userId = req.user.id;
         try {
-            const cart = await Cart.find({ userId });
+            const cart = await Cart.find({ userId })
+                .populate('products.cartItem', "_id name imageUrl price category");
             res.status(200).json(cart);
         } catch (error) {
             res.status(500).json(error);
@@ -59,5 +57,30 @@ module.exports = {
         } catch (error) {
             res.status(500).json(error);
         }
-    }
+    },
 }
+
+const incrementQuantity = (cart, cartItem) => {
+    const existingProduct = cart.products.find(
+        product => product.cartItem.toString() === cartItem
+    );
+
+    if (existingProduct) {
+        existingProduct.quantity += 1;
+    } else {
+        cart.products.push({ cartItem, quantity: 1 });
+    }
+};
+
+const decrementQuantity = (cart, cartItem) => {
+    const existingProduct = cart.products.find(
+        product => product.cartItem.toString() === cartItem
+    );
+
+    if (existingProduct && existingProduct.quantity > 1) {
+        existingProduct.quantity -= 1;
+    } else {
+        // Remove the product from the cart or handle any other behavior
+        cart.products = cart.products.filter(product => product.cartItem.toString() !== cartItem);
+    }
+};
