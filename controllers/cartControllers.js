@@ -4,8 +4,7 @@ const Cart = require("../models/Cart");
 module.exports = {
     addCart: async (req, res) => {
         const userId = req.user.id;
-        const { cartItem, quantity, action } = req.body;
-
+        const { cartItem, quantity, action, size } = req.body;
         try {
             let cart = await Cart.findOne({ userId });
 
@@ -17,9 +16,9 @@ module.exports = {
             }
 
             if (action === 'increment') {
-                incrementQuantity(cart, cartItem);
+                incrementQuantity(cart, cartItem, size);
             } else if (action === 'decrement') {
-                decrementQuantity(cart, cartItem);
+                decrementQuantity(cart, cartItem, size);
             }
 
             await cart.save();
@@ -60,7 +59,7 @@ module.exports = {
     },
 }
 
-const incrementQuantity = (cart, cartItem) => {
+const incrementQuantity = (cart, cartItem, size) => {
     const existingProduct = cart.products.find(
         product => product.cartItem.toString() === cartItem
     );
@@ -68,7 +67,7 @@ const incrementQuantity = (cart, cartItem) => {
     if (existingProduct) {
         existingProduct.quantity += 1;
     } else {
-        cart.products.push({ cartItem, quantity: 1 });
+        cart.products.push({ cartItem, quantity: 1, size });
     }
 };
 
