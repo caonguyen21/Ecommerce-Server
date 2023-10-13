@@ -6,6 +6,7 @@ const authRoute = require('./routes/auth');
 const userRoute = require('./routes/user');
 const ordersRoute = require('./routes/orders');
 const cartRoute = require('./routes/cart');
+const favoriteRoutes = require('./routes/favorite');
 
 dotenv.config();
 mongoose.connect(process.env.MONGO_URL)
@@ -28,7 +29,8 @@ app.use('/api/users', userRoute);
 app.use('/api/orders', ordersRoute);
 // Cart route
 app.use('/api/cart', cartRoute);
-
+// fav route
+app.use('/api/favorites', favoriteRoutes);
 app.listen(port, () => {
   console.log(`Listening on port ${port}!`);
 });
