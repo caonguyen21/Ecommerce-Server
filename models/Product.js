@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 
+const CommentSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    text: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+});
+
 const ProductSchema = new mongoose.Schema({
     name: { type: String, required: true },
     title: { type: String, required: true },
@@ -14,9 +20,10 @@ const ProductSchema = new mongoose.Schema({
             }
         ],
     },
-
+    comments: [CommentSchema],
     price: { type: String, required: true },
     description: { type: String, required: true },
+
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', ProductSchema);

@@ -31,6 +31,7 @@ app.use('/api/orders', ordersRoute);
 app.use('/api/cart', cartRoute);
 // fav route
 app.use('/api/favorites', favoriteRoutes);
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}!`);
 });

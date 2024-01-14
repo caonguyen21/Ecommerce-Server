@@ -72,5 +72,29 @@ module.exports = {
         } catch (error) {
             res.status(500).json("failed to search product");
         }
-    }
+    },
+    addComment: async (req, res) => {
+        const { productId, text } = req.body;
+        const userId = req.user.id;
+
+        try {
+            const product = await Product.findById(productId);
+
+            if (!product) {
+                return res.status(404).json({ success: false, error: 'Product not found' });
+            }
+
+            const newComment = {
+                user: userId,
+                text,
+            };
+
+            product.comments.push(newComment);
+            await product.save();
+
+            res.status(201).json({ success: true, comment: newComment });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    },
 }

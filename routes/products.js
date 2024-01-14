@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const productsControllers = require('../controllers/productControllers');
-
+const { verifyToken } = require('../middleware/verifyToken')
 // Create a new product
 router.post('/', productsControllers.createProduct);
 
@@ -19,4 +19,7 @@ router.delete('/:id', productsControllers.deleteProduct);
 
 // Search a product by name
 router.get('/search/:key', productsControllers.searchProducts);
+
+// Example route for adding a comment
+router.post('/addComment', verifyToken, productsControllers.addComment);
 module.exports = router;
