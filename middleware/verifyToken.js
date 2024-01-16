@@ -1,17 +1,26 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
     const authHeader = req.headers.token;
     if (authHeader) {
         const token = authHeader.split(" ")[1];
-        jwt.verify(token, process.env.JWT_SEC, async (err, user) => {
-            if (err) res.status(403).json('Invalid token');
+        try {
+            const decodedToken = jwt.verify(token, process.env.JWT_SEC);
+            const user = await User.findById(decodedToken.id);
+
+            if (!user) {
+                return res.status(403).json('Invalid token');
+            }
+
             req.user = user;
-            next()
-        })
+            next();
+        } catch (err) {
+            return res.status(403).json('Invalid token');
+        }
     } else {
-        return res.status(401).json('You are not authenticated')
+        return res.status(401).json('You are not authenticated');
     }
-}
+};
+
 module.exports = { verifyToken };

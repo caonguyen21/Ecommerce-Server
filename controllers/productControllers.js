@@ -75,25 +75,29 @@ module.exports = {
     },
     addComment: async (req, res) => {
         const { productId, text } = req.body;
-        const userId = req.user.id;
-
+        if (!req.headers.token || !req.user || !req.user.id || !req.user.username) {
+            console.error('User not authenticated:', req.user);
+            return res.status(401).json({ success: false, error: 'User not authenticated' });
+        }
+    
         try {
             const product = await Product.findById(productId);
-
+    
             if (!product) {
                 return res.status(404).json({ success: false, error: 'Product not found' });
             }
-
+    
             const newComment = {
-                user: userId,
-                text,
+                username: req.user.username, // Ensure username is correctly extracted
+                text: text,
             };
-
+    
             product.comments.push(newComment);
             await product.save();
-
+    
             res.status(201).json({ success: true, comment: newComment });
         } catch (error) {
+            console.error('Error:', error);
             res.status(500).json({ success: false, error: error.message });
         }
     },
